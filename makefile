@@ -7,14 +7,14 @@ all:
 	make client
 
 server:
-	$(CROSS_COMPILE)$(CC) $(CFLAGS) server.c -o server
+	$(CROSS_COMPILE)$(CC) server.c -o server
 
 client:
-	$(CROSS_COMPILE)$(CC) $(CFLAGS) client.c -o client
+	$(CROSS_COMPILE)$(CC) client.c -o client
 
 rebuild:
 	make clean
 	make
 
 clean: 
-	rm -rf *o main
+	rm -rf *o server client

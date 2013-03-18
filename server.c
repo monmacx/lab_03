@@ -10,27 +10,59 @@
 
 int main(int argc, char *argv[])
 {
-	int sock = 0, connfd = 0;
-	struct sockaddr_in serv_addr; 
+	if(argc != 2) {
+		printf("Expected commandline parameter with file name was not specified.\n");
+		return 1;
+	} else {
+		FILE *pFile;
+		long lSize;
+		char * buffer;
+		size_t result;
 
-	char sendBuff[1025];
+		pFile = fopen(argv[1], "r");
+		if (pFile == NULL) {
+			fputs("Opening file error", stderr);
+			exit(1);
+		}
 
-	sock = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&server_address, '0', sizeof(server_address));
-	memset(sendBuff, '0', sizeof(sendBuff)); 
+		// Obtaining file size
+		fseek(pFile, 0, SEEK_END);
+		lSize = ftell(pFile);
+		rewind(pFile);
 
-	server_address.sin_family = AF_INET;
-	server_address.sin_addr.s_addr = htonl(INADDR_ANY);
-	server_address.sin_port = htons(5000); 
+		buffer = (char*)malloc(sizeof(char)*lSize);
+		if (buffer == NULL) {
+			fputs("Memory error", stderr);
+			exit(2);
+		}
 
-	bind(sock, (struct sockaddr*)&server_address, sizeof(server_address)); 
+		result = fread(buffer, 1, lSize, pFile);
+		if (result != lSize) {
+			fputs("Reading error", stderr);
+			exit(3);
+		}
 
-	listen(sock, 1); 
+		int sock = 0, connfd = 0;
+		struct sockaddr_in server_address; 
 
-    connfd = accept(sock, (struct sockaddr*)NULL, NULL); 
+		sock = socket(AF_INET, SOCK_STREAM, 0);
+		memset(&server_address, '0', sizeof(server_address));
 
-    write(connfd, sendBuff, ); 
+		server_address.sin_family = AF_INET;
+		server_address.sin_addr.s_addr = htonl(INADDR_ANY);
+		server_address.sin_port = htons(5000); 
 
-    close(connfd);
-    sleep(1);
+		bind(sock, (struct sockaddr*)&server_address, sizeof(server_address)); 
+
+		listen(sock, 1); 
+
+		connfd = accept(sock, (struct sockaddr*)NULL, NULL); 
+
+		write(connfd, buffer, lSize); 
+
+		close(connfd);
+		fclose(pFile);
+		free(buffer);
+		return 0;
+	}
 }
