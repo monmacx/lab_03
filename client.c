@@ -20,14 +20,15 @@ int main(int argc, char * argv[])
         return 1;
     } 
 
+    //allocating memory for received data and creating socket
     memset(recvBuff, '0',sizeof(recvBuff));
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Error : Could not create socket \n");
         return 1;
     }
 
+    //configuring address and validating it
     memset(&server_address, '0', sizeof(server_address)); 
-
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(5000); 
 
@@ -36,16 +37,19 @@ int main(int argc, char * argv[])
         return 1;
     } 
 
+    //connecting and handling error
     if( connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
        printf("\n Error : Connect Failed \n");
        return 1;
     } 
 
+    //opening file for writing received data
     if((stream = freopen("file.in", "w", stdout)) == NULL) {
         printf("\n Write error \n");
         return 1;
     }
 
+    //reading data from socket
     while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0) {
         recvBuff[n] = 0;
         if(fputs(recvBuff, stdout) == EOF) {
