@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <pthread.h>
+#include "file_read.h"
 
 struct _message
 {
@@ -16,6 +17,7 @@ struct _message
 	int index;
 };
 
+// Function to send file to client
 void *send_file_to_client(void *ptr)
 {
 	struct _message *mes;
@@ -30,34 +32,8 @@ int main(int argc, char *argv[])
 		printf("Expected commandline parameter with file name was not specified.\n");
 		return 1;
 	} else {
-		FILE *pFile;
-		int lSize;
-		char * buffer;
-		size_t result;
-
-		pFile = fopen(argv[1], "r");
-		if (pFile == NULL) {
-			fputs("Opening file error", stderr);
-			exit(1);
-		}
-
-		// Obtaining file size
-		fseek(pFile, 0, SEEK_END);
-		lSize = ftell(pFile);
-		rewind(pFile);
-
-		buffer = (char*)malloc(sizeof(char)*lSize);
-		if (buffer == NULL) {
-			fputs("Memory error", stderr);
-			exit(2);
-		}
-
-		result = fread(buffer, 1, lSize, pFile);
-		if (result != lSize) {
-			fputs("Reading error", stderr);
-			exit(3);
-		}
-
+		struct file_info info = read_file(argv[1]); 
+		// Defining and initializing socket
 		int sock = 0, connfd = 0;
 		struct sockaddr_in server_address; 
 
@@ -68,22 +44,29 @@ int main(int argc, char *argv[])
 		server_address.sin_addr.s_addr = htonl(INADDR_ANY);
 		server_address.sin_port = htons(5000); 
 
+		// Bind socket to address
 		bind(sock, (struct sockaddr*)&server_address, sizeof(server_address)); 
 
-		while(1) {
+		int i = 5;
+		// Starting server
+		while(i--) {
+			// Start listening socket
 			listen(sock, 10);
+
+			//Initializing data for starting sending file in the separate thread
 			struct _message mes;
-			mes.file = buffer;
-			mes.size = lSize;
+			mes.file = info.content;
+			mes.size = info.size;
+
+			// Accepting connection and getting connection identifier
 			mes.index = accept(sock, (struct sockaddr*)NULL, NULL); 
 			pthread_t thread;
 			pthread_create(&thread, NULL, send_file_to_client, (void*)&mes);
 		}
 		
 
-		close(connfd);
-		fclose(pFile);
-		free(buffer);
+		close(sock);
+		free(info.content);
 		return 0;
 	}
 }
