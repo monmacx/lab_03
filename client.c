@@ -8,58 +8,52 @@
 #include <netdb.h>
 #include <string.h>
 
-int main(int argc, char * argv[]) {
+int main(int argc, char * argv[]) 
+{
 	int sockfd = 0, n = 0;
     char recvBuff[10000];
     FILE *stream;
     struct sockaddr_in server_address; 
 
-    if(argc != 2)
-    {
+    if(argc != 2) {
         printf("\n Usage: %s <ip of server> \n",argv[0]);
         return 1;
     } 
 
     memset(recvBuff, '0',sizeof(recvBuff));
-    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
+    if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         printf("\n Error : Could not create socket \n");
         return 1;
-    } 
+    }
 
     memset(&server_address, '0', sizeof(server_address)); 
 
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(5000); 
 
-    if(inet_pton(AF_INET, argv[1], &server_address.sin_addr)<=0)
-    {
+    if(inet_pton(AF_INET, argv[1], &server_address.sin_addr)<=0) {
         printf("\n Error : wrong address\n");
         return 1;
     } 
 
-    if( connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
-    {
+    if( connect(sockfd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
        printf("\n Error : Connect Failed \n");
        return 1;
     } 
 
-    if((stream = freopen("file.in", "w", stdout)) == NULL)
-    {
+    if((stream = freopen("file.in", "w", stdout)) == NULL) {
         printf("\n Write error \n");
         return 1;
     }
-    while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0)
-    {
+
+    while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0) {
         recvBuff[n] = 0;
-        if(fputs(recvBuff, stdout) == EOF)
-        {
+        if(fputs(recvBuff, stdout) == EOF) {
             printf("\n Error : Fputs error\n");
         }
     } 
 
-    if(n < 0)
-    {
+    if(n < 0) {
         printf("\n Read error \n");
     } 
 

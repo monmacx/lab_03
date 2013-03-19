@@ -7,6 +7,22 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
+#include <pthread.h>
+
+struct _message
+{
+	char * file;
+	int size;
+	int index;
+};
+
+void *send_file_to_client(void *ptr)
+{
+	struct _message *mes;
+	mes = (struct message *)ptr;
+	write(mes->index, mes->file, mes->size);
+	return;
+}
 
 int main(int argc, char *argv[])
 {
@@ -54,13 +70,16 @@ int main(int argc, char *argv[])
 
 		bind(sock, (struct sockaddr*)&server_address, sizeof(server_address)); 
 
-		listen(sock, 1); 
-
-		connfd = accept(sock, (struct sockaddr*)NULL, NULL); 
-
-		write(lSize, &lSize, sizeof(lSize));
-		printf("%d\n", lSize);
-		write(connfd, buffer, lSize); 
+		while(1) {
+			listen(sock, 10);
+			struct _message mes;
+			mes.file = buffer;
+			mes.size = lSize;
+			mes.index = accept(sock, (struct sockaddr*)NULL, NULL); 
+			pthread_t thread;
+			pthread_create(&thread, NULL, send_file_to_client, (void*)&mes);
+		}
+		
 
 		close(connfd);
 		fclose(pFile);
