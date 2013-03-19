@@ -18,6 +18,7 @@ int main(int argc, char *argv[])
 		return 1;
 	} else {
 		struct file_info info = read_file(argv[1]); 
+		printf("%s\n", info.content);
 		// Defining and initializing socket
 		int sock = 0, connfd = 0;
 		struct sockaddr_in server_address; 

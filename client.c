@@ -44,10 +44,10 @@ int main(int argc, char * argv[])
     } 
 
     //opening file for writing received data
-    if((stream = freopen("file.in", "w", stdout)) == NULL) {
-        printf("\n Write error \n");
-        return 1;
-    }
+    // if((stream = freopen("file.in", "w", stdout)) == NULL) {
+    //     printf("\n Write error \n");
+    //     return 1;
+    // }
 
     //reading data from socket
     while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0) {
