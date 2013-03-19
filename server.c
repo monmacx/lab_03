@@ -9,22 +9,7 @@
 #include <sys/types.h>
 #include <pthread.h>
 #include "file_read.h"
-
-struct _message
-{
-	char * file;
-	int size;
-	int index;
-};
-
-// Function to send file to client
-void *send_file_to_client(void *ptr)
-{
-	struct _message *mes;
-	mes = (struct message *)ptr;
-	write(mes->index, mes->file, mes->size);
-	return;
-}
+#include "file_sender.h"
 
 int main(int argc, char *argv[])
 {

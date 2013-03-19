@@ -7,7 +7,7 @@ all:
 	make client
 
 server:
-	$(CROSS_COMPILE)$(CC) file_read.c server.c -o server
+	$(CROSS_COMPILE)$(CC) file_sender.c file_read.c server.c -o server
 
 client:
 	$(CROSS_COMPILE)$(CC) client.c -o client
