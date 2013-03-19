@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 		connfd = accept(sock, (struct sockaddr*)NULL, NULL); 
 
 		write(lSize, &lSize, sizeof(lSize));
+		printf("%d\n", lSize);
 		write(connfd, buffer, lSize); 
 
 		close(connfd);

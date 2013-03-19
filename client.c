@@ -10,9 +10,7 @@
 
 int main(int argc, char * argv[]) {
 	int sockfd = 0, n = 0;
-	char *bufSizeBytes;
-	int bufSizeLength = sizeof(int);
-    char *recvBuff;
+    char recvBuff[10000];
     struct sockaddr_in server_address; 
 
     if(argc != 2)
@@ -21,9 +19,7 @@ int main(int argc, char * argv[]) {
         return 1;
     } 
 
-    bufSizeBytes = (char*)malloc(bufSizeLength);
-    memset(bufSizeBytes, '0', sizeof(bufSizeBytes));
-    //memset(recvBuff, '0',sizeof(recvBuff));
+    memset(recvBuff, '0',sizeof(recvBuff));
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("\n Error : Could not create socket \n");
@@ -47,10 +43,10 @@ int main(int argc, char * argv[]) {
        return 1;
     } 
 
-    while ( (n = read(sockfd, bufSizeBytes, sizeof(bufSizeBytes)-1)) > 0)
+    while ( (n = read(sockfd, recvBuff, sizeof(recvBuff)-1)) > 0)
     {
-        bufSizeBytes[n] = 0;
-        if(fputs(bufSizeBytes, stdout) == EOF)
+        recvBuff[n] = 0;
+        if(fputs(recvBuff, stdout) == EOF)
         {
             printf("\n Error : Fputs error\n");
         }
